@@ -14,7 +14,7 @@ const getSingleDrink = async (id) => {
 
 const SingleDrink = async ({ params }) => {
   const data = await getSingleDrink(params.id);
-  console.log(data?.drinks);
+
   const title = data?.drinks[0]?.strDrink;
   const imgSrc = data?.drinks[0]?.strDrinkThumb;
   return (
