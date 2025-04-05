@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export function middleware(request) {
-  return NextResponse.redirect(new URL("/", request.url));
-}
+const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
 
-// See "Matching Paths" below to learn more
+export default clerkMiddleware(async (auth, req) => {
+  if (!isPublicRoute(req)) await auth.protect();
+});
+
 export const config = {
-  matcher: ["/about/:path*"],
-  // matcher: ["/about/:path*", "/tasks/:path*"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
