@@ -1,11 +1,23 @@
 import Link from "next/link";
 import { getPost } from "@/utils/actions";
-import PostForm from "@/components/blog/PostForm";
-import { notFound } from "next/navigation";
+import EditPostForm from "@/components/blog/EditPostForm";
+import { notFound, redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
 
 const EditPostPage = async ({ params }) => {
+  const user = await currentUser();
+
+  const isAdmin =
+    user?.emailAddresses?.find(
+      (email) => email.id === user.primaryEmailAddressId
+    )?.emailAddress === process.env.ADMIN_EMAIL;
+
+  if (!isAdmin) {
+    redirect("/blog");
+  }
+
   const post = await getPost(params.id);
-  
+
   if (!post) {
     return notFound();
   }
@@ -17,17 +29,16 @@ const EditPostPage = async ({ params }) => {
           ← 글로 돌아가기
         </Link>
       </div>
-      
+
       <h1 className="text-3xl font-bold mb-6">게시글 수정</h1>
-      
-      <PostForm 
+
+      <EditPostForm
         postId={post.id}
         initialData={{
           title: post.title,
           content: post.content,
-          author: post.author
+          author: post.author,
         }}
-        isEditing={true}
       />
     </div>
   );
