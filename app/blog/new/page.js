@@ -1,4 +1,3 @@
-// app/blog/new/page.js - 새 게시글 작성 페이지
 import Link from "next/link";
 import PostForm from "@/components/blog/PostForm";
 

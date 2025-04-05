@@ -1,4 +1,3 @@
-// components/blog/DeleteButton.jsx
 "use client";
 
 import { useState } from "react";

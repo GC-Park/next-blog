@@ -1,4 +1,3 @@
-// app/blog/[id]/page.js - 게시글 상세 페이지
 import Link from "next/link";
 import { getPost } from "@/utils/actions";
 import { formatDistanceToNow } from "@/utils/date-formatter";

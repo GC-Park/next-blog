@@ -1,4 +1,3 @@
-// app/blog/[id]/edit/page.js - 게시글 수정 페이지
 import Link from "next/link";
 import { getPost } from "@/utils/actions";
 import PostForm from "@/components/blog/PostForm";
