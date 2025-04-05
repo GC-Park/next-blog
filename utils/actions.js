@@ -4,6 +4,7 @@ import prisma from "@/utils/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { currentUser } from "@clerk/nextjs/server";
 
 export const getAllTasks = async () => {
   return prisma.task.findMany({
@@ -80,7 +81,6 @@ export const editTask = async (formData) => {
   redirect("/tasks");
 };
 
-// Blog
 export const getAllPosts = async () => {
   return prisma.post.findMany({
     orderBy: {
@@ -106,9 +106,22 @@ const PostSchema = z.object({
 });
 
 export const createPost = async (prevState, formData) => {
+  const user = await currentUser();
+
+  const userEmail = user?.emailAddresses?.find(
+    (email) => email.id === user.primaryEmailAddressId
+  )?.emailAddress;
+
+  const isAdmin = userEmail === process.env.ADMIN_EMAIL;
+
+  if (!isAdmin) {
+    console.log("관리자 아님:", userEmail, "!==", process.env.ADMIN_EMAIL);
+    return { message: "unauthorized", error: "글 작성 권한이 없습니다" };
+  }
+
   const title = formData.get("title");
   const content = formData.get("content");
-  const author = formData.get("author") || "익명";
+  const author = formData.get("author") || "박근철";
 
   try {
     PostSchema.parse({ title, content });
@@ -117,7 +130,7 @@ export const createPost = async (prevState, formData) => {
       data: {
         title,
         content,
-        author,
+        author: author || user?.name || "박근철",
         published: true,
       },
     });
@@ -125,14 +138,29 @@ export const createPost = async (prevState, formData) => {
     revalidatePath("/blog");
     return { message: "success" };
   } catch (error) {
+    console.error("글 작성 오류:", error);
     return { message: "error" };
   }
 };
 
 export const updatePost = async (prevState, formData) => {
+  const user = await currentUser();
+
+  const userEmail = user?.emailAddresses?.find(
+    (email) => email.id === user.primaryEmailAddressId
+  )?.emailAddress;
+
+  const isAdmin = userEmail === process.env.ADMIN_EMAIL;
+
+  if (!isAdmin) {
+    console.log("관리자 아님:", userEmail, "!==", process.env.ADMIN_EMAIL);
+    return { message: "unauthorized", error: "글 수정 권한이 없습니다" };
+  }
+
   const id = formData.get("id");
   const title = formData.get("title");
   const content = formData.get("content");
+  const author = formData.get("author") || 박근철;
 
   try {
     PostSchema.parse({ title, content });
@@ -144,27 +172,33 @@ export const updatePost = async (prevState, formData) => {
       data: {
         title,
         content,
+        ...(author && { author }),
         updatedAt: new Date(),
       },
     });
 
     revalidatePath(`/blog/${id}`);
-    return { success: true, post };
+    return { message: "success" };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { 
-        message: "validation-error", 
-        errors: error.errors.map(err => ({
-          path: err.path[0],
-          message: err.message
-        }))
-      };
-    }
-    return { success: false, error: "게시글 수정 중 오류가 발생했습니다." };
+    console.error("글 수정 오류:", error);
+    return { message: "error" };
   }
 };
 
 export const deletePost = async (formData) => {
+  const user = await currentUser();
+
+  const userEmail = user?.emailAddresses?.find(
+    (email) => email.id === user.primaryEmailAddressId
+  )?.emailAddress;
+
+  const isAdmin = userEmail === process.env.ADMIN_EMAIL;
+
+  if (!isAdmin) {
+    console.log("관리자 아님:", userEmail, "!==", process.env.ADMIN_EMAIL);
+    return { message: "unauthorized", error: "글 삭제 권한이 없습니다" };
+  }
+
   try {
     const id = formData.get("id");
 
@@ -175,9 +209,9 @@ export const deletePost = async (formData) => {
     });
 
     revalidatePath("/blog");
-    return { success: true };
+    return { message: "success" };
   } catch (error) {
     console.error("deletePost 에러:", error);
-    return { success: false, error: "게시글 삭제 중 오류가 발생했습니다." };
+    return { message: "error", error: "게시글 삭제 중 오류가 발생했습니다." };
   }
 };
