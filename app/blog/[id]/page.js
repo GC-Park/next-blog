@@ -3,6 +3,7 @@ import { getPost } from "@/utils/actions";
 import { formatDistanceToNow } from "@/utils/date-formatter";
 import DeleteButton from "@/components/blog/DeleteButton";
 import { currentUser } from "@clerk/nextjs/server";
+import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
 
 export const dynamic = "force-dynamic";
 
@@ -53,8 +54,8 @@ const PostPage = async ({ params }) => {
           )}
         </div>
 
-        <div className="prose max-w-none mb-8 whitespace-pre-wrap">
-          {post.content}
+        <div className="bg-white border border-base-200 rounded-lg p-6 shadow-sm mb-8">
+          <MarkdownRenderer content={post.content} />
         </div>
 
         <div className="flex gap-2 mt-8">
