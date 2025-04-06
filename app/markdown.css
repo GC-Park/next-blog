@@ -1,0 +1,85 @@
+/* 마크다운 스타일 */
+.markdown-content {
+  @apply prose prose-lg max-w-none;
+}
+
+.markdown-content h1 {
+  @apply text-3xl font-bold mt-8 mb-4;
+}
+
+.markdown-content h2 {
+  @apply text-2xl font-bold mt-6 mb-4;
+}
+
+.markdown-content h3 {
+  @apply text-xl font-bold mt-5 mb-3;
+}
+
+.markdown-content p {
+  @apply my-4;
+}
+
+.markdown-content a {
+  @apply text-primary hover:underline;
+}
+
+.markdown-content blockquote {
+  @apply border-l-4 border-primary bg-base-200 p-4 my-4 italic;
+}
+
+.markdown-content ul {
+  @apply list-disc pl-6 my-4;
+}
+
+.markdown-content ol {
+  @apply list-decimal pl-6 my-4;
+}
+
+.markdown-content code {
+  @apply bg-base-200 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.markdown-content pre {
+  @apply bg-base-200 p-4 rounded-lg my-4 overflow-x-auto;
+}
+
+.markdown-content pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown-content img {
+  @apply rounded-lg shadow-md max-w-full mx-auto my-4;
+}
+
+.markdown-content hr {
+  @apply my-8 border-base-300;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse my-4;
+}
+
+.markdown-content th {
+  @apply bg-base-200 border border-base-300 p-2 text-left;
+}
+
+.markdown-content td {
+  @apply border border-base-300 p-2;
+}
+
+/* 마크다운 에디터 스타일 */
+.EasyMDEContainer {
+  @apply border-none;
+}
+
+.editor-toolbar {
+  @apply border-b border-base-300 bg-base-100 rounded-t-lg;
+}
+
+.CodeMirror {
+  @apply border-none rounded-b-lg min-h-64;
+}
+
+.editor-statusbar {
+  @apply text-xs text-gray-500 mt-1 text-right;
+}
