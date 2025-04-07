@@ -16,10 +16,12 @@ export const getAllTasks = async () => {
 
 export const createTask = async (formData) => {
   const content = formData.get("content");
+  const date = formData.get("date") || new Date().toISOString();
 
   await prisma.task.create({
     data: {
       content,
+      date: new Date(date),
     },
   });
 
@@ -28,6 +30,7 @@ export const createTask = async (formData) => {
 
 export const createTaskCustom = async (prevState, formData) => {
   const content = formData.get("content");
+  const date = formData.get("date") || new Date().toISOString();
 
   const Task = z.object({
     content: z.string().min(5),
@@ -40,9 +43,11 @@ export const createTaskCustom = async (prevState, formData) => {
     await prisma.task.create({
       data: {
         content,
+        date: new Date(date),
       },
     });
-    revalidatePath("/tasks");
+
+    revalidatePath(`/tasks/date`);
     return { message: "success" };
   } catch (error) {
     return { message: "error" };
@@ -51,8 +56,10 @@ export const createTaskCustom = async (prevState, formData) => {
 
 export const deleteTask = async (formData) => {
   const id = formData.get("id");
+  const date = formData.get("date") || new Date().toISOString();
+
   await prisma.task.delete({ where: { id } });
-  revalidatePath("/tasks");
+  revalidatePath(`/tasks/date`);
 };
 
 export const getTask = async (id) => {
@@ -67,6 +74,7 @@ export const editTask = async (formData) => {
   const id = formData.get("id");
   const content = formData.get("content");
   const completed = formData.get("completed");
+  const date = formData.get("date");
 
   await prisma.task.update({
     where: {
@@ -75,10 +83,66 @@ export const editTask = async (formData) => {
     data: {
       content: content,
       completed: completed === "on" ? true : false,
+      ...(date && { date: new Date(date) }),
     },
   });
 
-  redirect("/tasks");
+  redirect(`/tasks/date/${date}`);
+};
+
+export const getTasksByDate = async (date) => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  return prisma.task.findMany({
+    where: {
+      date: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getMonthTaskCounts = async (year, month) => {
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 0);
+
+  const tasks = await prisma.task.findMany({
+    where: {
+      date: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    select: {
+      date: true,
+      completed: true,
+    },
+  });
+
+  const taskMap = {};
+
+  tasks.forEach((task) => {
+    const day = task.date.getDate();
+
+    if (!taskMap[day]) {
+      taskMap[day] = { total: 0, completed: 0 };
+    }
+
+    taskMap[day].total += 1;
+    if (task.completed) {
+      taskMap[day].completed += 1;
+    }
+  });
+
+  return taskMap;
 };
 
 export const getAllPosts = async () => {
