@@ -1,8 +1,11 @@
 "use client";
 import { editTask } from "@/utils/actions";
+import { format } from "date-fns";
 
 const EditForm = ({ task }) => {
-  const { id, completed, content } = task;
+  const { id, completed, content, date } = task;
+  const formattedDate = format(date, "yyyy-MM-dd");
+
   return (
     <form
       action={editTask}
@@ -18,6 +21,7 @@ const EditForm = ({ task }) => {
         name="content"
         className="input input-bordered w-full"
       />
+      <input type="hidden" name="date" value={formattedDate} />
 
       {/* completed */}
       <div className="form-control my-4">
