@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { getPost } from "@/utils/actions";
+import { getPost, getCommentsByPostId } from "@/utils/actions";
 import { formatDistanceToNow } from "@/utils/date-formatter";
 import DeleteButton from "@/components/blog/DeleteButton";
 import { currentUser } from "@clerk/nextjs/server";
 import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
+import { CommentSection } from "@/components/blog/comments";
 
 export const dynamic = "force-dynamic";
 
 const PostPage = async ({ params }) => {
   const post = await getPost(params.id);
+  const comments = await getCommentsByPostId(params.id);
   const user = await currentUser();
 
   const isAdmin =
@@ -70,6 +72,11 @@ const PostPage = async ({ params }) => {
               <DeleteButton postId={post.id} />
             </>
           ) : null}
+        </div>
+
+        <div className="border-t border-base-200 pt-8">
+          <h2 className="text-2xl font-bold mb-6">댓글</h2>
+          <CommentSection comments={comments} postId={post.id} />
         </div>
       </article>
     </div>
