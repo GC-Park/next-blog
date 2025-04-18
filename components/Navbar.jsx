@@ -6,9 +6,6 @@ import { useAuth, UserButton, SignInButton } from "@clerk/nextjs";
 import { useState } from "react";
 
 const links = [
-  { href: "/client", label: "client" },
-  { href: "/drinks", label: "drinks" },
-  { href: "/prisma-example", label: "query" },
   { href: "/tasks", label: "tasks" },
   { href: "/blog", label: "blog" },
 ];
