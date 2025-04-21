@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import toast from "react-hot-toast";
 
 const TaskItem = ({ task }) => {
   const [isCompleted, setIsCompleted] = useState(task.completed);
   const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
 
   const handleToggleComplete = async () => {
+    if (!isSignedIn) {
+      toast.error("관리자 권한이 필요합니다");
+      return;
+    }
+
     setIsCompleted(!isCompleted);
 
     const formData = new FormData();
@@ -29,7 +37,7 @@ const TaskItem = ({ task }) => {
       router.refresh();
     } catch (error) {
       console.error("Error updating task:", error);
-      setIsCompleted(isCompleted); // 에러 발생 시 원래 상태로 되돌림
+      setIsCompleted(isCompleted);
     }
   };
 
@@ -40,6 +48,7 @@ const TaskItem = ({ task }) => {
         checked={isCompleted}
         onChange={handleToggleComplete}
         className="checkbox checkbox-primary"
+        disabled={!isLoaded || !isSignedIn}
       />
       <h2
         className={`text-lg capitalize ${
