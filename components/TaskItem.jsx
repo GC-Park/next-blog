@@ -1,4 +1,3 @@
-// components/TaskItem.jsx (새 클라이언트 컴포넌트)
 "use client";
 
 import { useState } from "react";
