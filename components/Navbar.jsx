@@ -6,8 +6,9 @@ import { useAuth, UserButton, SignInButton } from "@clerk/nextjs";
 import { useState } from "react";
 
 const links = [
-  { href: "/tasks", label: "tasks" },
-  { href: "/blog", label: "blog" },
+  { href: "/aboutMe", label: "About Me" },
+  { href: "/tasks", label: "Tasks" },
+  { href: "/blog", label: "Blog" },
 ];
 
 const Navbar = () => {
