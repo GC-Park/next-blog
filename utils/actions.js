@@ -29,6 +29,16 @@ export const createTask = async (formData) => {
 };
 
 export const createTaskCustom = async (prevState, formData) => {
+  const user = await currentUser();
+  
+  const isAdmin = user?.emailAddresses?.find(
+    (email) => email.id === user?.primaryEmailAddressId
+  )?.emailAddress === process.env.ADMIN_EMAIL;
+  
+  if (!isAdmin) {
+    return { message: "unauthorized" };
+  }
+
   const content = formData.get("content");
   const date = formData.get("date") || new Date().toISOString();
 
@@ -55,11 +65,27 @@ export const createTaskCustom = async (prevState, formData) => {
 };
 
 export const deleteTask = async (formData) => {
-  const id = formData.get("id");
-  const date = formData.get("date") || new Date().toISOString();
+    const user = await currentUser();
+  
+  const isAdmin = user?.emailAddresses?.find(
+    (email) => email.id === user?.primaryEmailAddressId
+  )?.emailAddress === process.env.ADMIN_EMAIL;
+  
+  if (!isAdmin) {
+    return { message: "unauthorized" };
+  }
 
-  await prisma.task.delete({ where: { id } });
-  revalidatePath(`/tasks/date`);
+  try {
+    const id = formData.get("id");
+    const date = formData.get("date") || new Date().toISOString();
+
+    await prisma.task.delete({ where: { id } });
+    revalidatePath(`/tasks/date`);
+    return { message: "success" };
+  } catch (error) {
+    console.error("DeleteTask error:", error);
+    return { message: "error" };
+  }
 };
 
 export const getTask = async (id) => {
