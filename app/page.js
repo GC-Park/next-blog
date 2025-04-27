@@ -124,7 +124,7 @@ export default async function Home() {
         <p className="mb-6 max-w-lg mx-auto">
           블로그 내용에 관한 질문이나 협업 제안, 또는 그냥 인사를 나누고 싶으시다면 언제든지 연락주세요.
         </p>
-        <Link href="/contact" className="btn btn-accent">
+        <Link href="/aboutMe" className="btn btn-accent">
           연락하기
         </Link>
       </section>
