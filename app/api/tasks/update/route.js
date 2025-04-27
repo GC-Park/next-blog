@@ -1,9 +1,23 @@
 import { NextResponse } from "next/server";
 import prisma from "@/utils/db";
 import { revalidatePath } from "next/cache";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(request) {
   try {
+    const user = await currentUser();
+
+    const isAdmin = user?.emailAddresses?.find(
+      (email) => email.id === user?.primaryEmailAddressId
+    )?.emailAddress === process.env.ADMIN_EMAIL;
+    
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 403 }
+      );
+    }
+
     const formData = await request.formData();
     const id = formData.get("id");
     const content = formData.get("content");
